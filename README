@@ -1,0 +1,55 @@
+tprint
+~~~~~~
+
+a tiny printf implementation
+
+
+features
+~~~~~~~~
+
+- incomplete
+- breaks standards
+- insecure
+- possibly broken
+
+
+just what I need! how?
+~~~~~~~~~~~~~~~~~~~~~~
+
+format strings supported:
+
+ %%  - a literal '%'
+ %c  - a single char
+ %s  - a string
+ %d  - a signed int (four bytes)
+ %u  - an unsigned int (four bytes)
+ %x  - an unsigned hex int (four bytes)
+
+length modifiers:
+ - only supported in %d %u %x
+ - number 1, 2, 4, or 8 indicated the number of bytes
+ 1   - single byte
+       e.g. "%1x" : a two digit hex byte
+ 2   - (u)int16_t
+       e.g. "%2u"
+ 4   - (u)int32_t
+       e.g. "%4u"
+ 8   - (u)int64_t
+       e.g. "%8x" : a 16 digit uint64_t
+
+
+examples
+~~~~~~~~
+
+see test.c
+
+    tprint("he%1x, %s %s %s %s %s %8doo\n", 0x77, "the", "pride", "lies", "in", "itself", 2);
+    he77, the pride lies in itself 2oo
+
+
+license
+~~~~~~~
+
+WTFPL v2 - DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+
+see file LICENSE
