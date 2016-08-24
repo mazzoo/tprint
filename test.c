@@ -63,6 +63,12 @@ int main(int argc, char ** argv)
     tprint("a_%8u_g\n", 2222222223);
     tprint("a_%8u_g\n", 22222222223);
 
+    tprint("a_%s_b\n", "string");
+    tprint("a_%10s_b  10\n", "string");
+    tprint("a_%20s_b  20\n", "string");
+    tprint("a_%10-s_b -10\n", "string");
+    tprint("a_%20-s_b -20\n", "string");
+
     tprint("he%1x, %s %s %s %s %s %8doo\n", 0x77, "the", "pride", "lies", "in", "itself", 2);
 
     return 0;

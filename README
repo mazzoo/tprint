@@ -25,7 +25,7 @@ format strings supported:
  %u  - an unsigned int (four bytes)
  %x  - an unsigned hex int (four bytes)
 
-length modifiers:
+length modifiers in numbers:
  - only supported in %d %u %x
  - number 1, 2, 4, or 8 indicated the number of bytes
  1   - single byte
@@ -36,6 +36,11 @@ length modifiers:
        e.g. "%4u"
  8   - (u)int64_t
        e.g. "%8x" : a 16 digit uint64_t
+
+length modifiers in strings:
+ - supported in %s
+ N   - left aligned string of length N (padded with spaces ' ')
+ M-  - right aligned string of length M (padded with spaces ' ')
 
 
 examples

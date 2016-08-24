@@ -26,6 +26,11 @@ void tputs(char * s)
     while (*s) tputc(*s++);
 }
 
+void error_unsupported(void)
+{
+    tputs("ERROR: unsupported tprint format\n");
+}
+
 void tprint(char * fmt, ...)
 {
     char * buf = g_buf;
@@ -34,7 +39,7 @@ void tprint(char * fmt, ...)
     char ch;
     va_list ap;
     va_start(ap, fmt);
-    uint8_t len_mod = 0;
+    int16_t len_mod = 0;
     while ((ch = *fmt))
     {
         if (ch == '%')
@@ -54,9 +59,19 @@ void tprint(char * fmt, ...)
                     case 's':
                         {
                             char * p = va_arg(ap, char *);
+                            while (len_mod < 0)
+                            {
+                                buf[buf_off++] = ' ';
+                                len_mod++;
+                            }
                             while (*p)
                             {
                                 buf[buf_off++] = *p++;
+                            }
+                            while (len_mod > 0)
+                            {
+                                buf[buf_off++] = ' ';
+                                len_mod--;
                             }
                             fmt++;
                             fmt_done = 1;
@@ -75,30 +90,32 @@ void tprint(char * fmt, ...)
                             switch (len_mod)
                             {
                                 case 0:
-                                case '4':
+                                case 4:
                                     {
                                         uint32_t u = va_arg(ap, uint32_t);
                                         buf_off += strdec32(&buf[buf_off], u);
                                     }
                                     break;
-                                case '1':
+                                case 1:
                                     {
                                         uint8_t u = va_arg(ap, unsigned int);
                                         buf_off += strdec8(&buf[buf_off], u);
                                     }
                                     break;
-                                case '2':
+                                case 2:
                                     {
                                         uint16_t u = va_arg(ap, unsigned int);
                                         buf_off += strdec16(&buf[buf_off], u);
                                     }
                                     break;
-                                case '8':
+                                case 8:
                                     {
                                         uint64_t u = va_arg(ap, uint64_t);
                                         buf_off += strdec64(&buf[buf_off], u);
                                     }
                                     break;
+                                default:
+                                    error_unsupported();
                             }
                             fmt++;
                             fmt_done = 1;
@@ -109,30 +126,32 @@ void tprint(char * fmt, ...)
                             switch (len_mod)
                             {
                                 case 0:
-                                case '4':
+                                case 4:
                                     {
                                         int32_t d = va_arg(ap, int32_t);
                                         buf_off += strsigned32(&buf[buf_off], d);
                                     }
                                     break;
-                                case '1':
+                                case 1:
                                     {
                                         int8_t d = va_arg(ap, int);
                                         buf_off += strsigned8(&buf[buf_off], d);
                                     }
                                     break;
-                                case '2':
+                                case 2:
                                     {
                                         int16_t d = va_arg(ap, int);
                                         buf_off += strsigned16(&buf[buf_off], d);
                                     }
                                     break;
-                                case '8':
+                                case 8:
                                     {
                                         int64_t d = va_arg(ap, int64_t);
                                         buf_off += strsigned64(&buf[buf_off], d);
                                     }
                                     break;
+                                default:
+                                    error_unsupported();
                             }
                             fmt++;
                             fmt_done = 1;
@@ -143,49 +162,62 @@ void tprint(char * fmt, ...)
                             switch (len_mod)
                             {
                                 case 0:
-                                case '4':
+                                case 4:
                                     {
                                         int32_t i = va_arg(ap, int32_t);
                                         strhex32(&buf[buf_off], i);
                                         buf_off += 8;
                                     }
                                     break;
-                                case '1':
+                                case 1:
                                     {
                                         int8_t i = va_arg(ap, int);
                                         strhex8(&buf[buf_off], i);
                                         buf_off += 2;
                                     }
                                     break;
-                                case '2':
+                                case 2:
                                     {
                                         int16_t i = va_arg(ap, int);
                                         strhex16(&buf[buf_off], i);
                                         buf_off += 4;
                                     }
                                     break;
-                                case '8':
+                                case 8:
                                     {
                                         int64_t i = va_arg(ap, int64_t);
                                         strhex64(&buf[buf_off], i);
                                         buf_off += 16;
                                     }
                                     break;
+                                default:
+                                    error_unsupported();
                             }
                             fmt_done = 1;
                             fmt++;
                         }
                         break;
+                    case '0':
                     case '1':
                     case '2':
+                    case '3':
                     case '4':
+                    case '5':
+                    case '6':
+                    case '7':
                     case '8':
-                        len_mod = ch;
+                    case '9':
+                        len_mod = 10 * len_mod + ch - '0';
+                        fmt++;
+                        ch = *fmt;
+                        break;
+                    case '-':
+                        len_mod = - len_mod;
                         fmt++;
                         ch = *fmt;
                         break;
                     default:
-                        tputs("ERROR: unsupported tprint format\n");
+                        error_unsupported();
                         fmt_done = 1;
                 }
             }
