@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <stdint.h>
+#include <string.h> /* strlen() only */
 
 #include <tprint.h>
 
@@ -59,6 +60,10 @@ void tprint(char * fmt, ...)
                     case 's':
                         {
                             char * p = va_arg(ap, char *);
+                            if (len_mod < 0)
+                            {
+                                len_mod += strlen(p);
+                            }
                             while (len_mod < 0)
                             {
                                 buf[buf_off++] = ' ';
@@ -67,6 +72,7 @@ void tprint(char * fmt, ...)
                             while (*p)
                             {
                                 buf[buf_off++] = *p++;
+                                if (len_mod > 0) len_mod--;
                             }
                             while (len_mod > 0)
                             {
